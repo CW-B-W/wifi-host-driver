@@ -90,7 +90,7 @@ BUILD_FOLDER := build/whd
 MKDIR = mkdir -p $1
 
 rwildcard=$(wildcard $(addsuffix $2, $1)) $(foreach d,$(wildcard $(addsuffix *, $1)),$(call rwildcard,$d/,$2))
-SRC_FOLDER := WiFi_Host_Driver/src/
+SRC_FOLDER := WiFi_Host_Driver/src/ External-impl/
 SRC := $(filter %.c,$(call rwildcard,$(SRC_FOLDER),*.c))
 OBJ := $(patsubst %.c,%.o, $(SRC))
 OBJS = $(addprefix $(BUILD_FOLDER)/,$(OBJ))
@@ -98,6 +98,10 @@ OBJS = $(addprefix $(BUILD_FOLDER)/,$(OBJ))
 CFLAGS := $(COMPILER_FLAGS) $(DEP_FLAGS) $(INC_FLAGS) $(EXTRA_FLAGS)
 
 ###################### Set the make variable ###########################################
+$(BUILD_FOLDER)/main.out : $(BUILD_FOLDER)/libwhd.a main.c
+	@echo Generating $@
+	$(QUIET)$(CC) $(CFLAGS) --specs=nosys.specs -o $(BUILD_FOLDER)/main.out main.c -Lbuild/whd -lwhd
+
 $(BUILD_FOLDER)/libwhd.a : $(OBJS)
 	@echo Archiving $@
 	$(QUIET)$(AR) $(COMPILER_SPECIFIC_ARFLAGS_CREATE) $(BUILD_FOLDER)/libwhd.a $(OBJS)

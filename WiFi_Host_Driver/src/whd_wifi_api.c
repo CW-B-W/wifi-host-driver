@@ -3713,7 +3713,7 @@ whd_iovar_mkbuf(const char *name, char *data, uint32_t datalen, char *iovar_buf,
         memmove(&iovar_buf[iovar_len], data, datalen);
 
     /* copy the name to the beginning of the buffer */
-    strncpy(iovar_buf, name, (iovar_len - 1) );
+    memcpy(iovar_buf, name, (iovar_len - 1) );
 
     return WHD_SUCCESS;
 }
