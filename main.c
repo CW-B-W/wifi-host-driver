@@ -7,6 +7,7 @@
 #include "WiFi_Host_Driver/inc/whd_network_types.h"
 #include "WiFi_Host_Driver/inc/whd_events.h"
 #include "WiFi_Host_Driver/inc/whd_version.h"
+#include "External/bsp/cybsp_types.h"
 
 int main()
 {
@@ -25,10 +26,17 @@ int main()
     
 
     // Attach a bus SDIO or SPI
+#if CYBSP_WIFI_INTERFACE_TYPE == CYBSP_SDIO_INTERFACE
     whd_sdio_config_t *whd_sdio_cfg = malloc(sizeof(whd_sdio_config_t));
     cyhal_sdio_t *sdhc_obj = malloc(sizeof(cyhal_sdio_t));
     whd_bus_sdio_attach(whd_driver, whd_sdio_cfg, sdhc_obj);
-    //or whd_bus_spi_attach(whd_driver, &whd_spi_cfg, &spi_obj);
+#elif CYBSP_WIFI_INTERFACE_TYPE == CYBSP_SPI_INTERFACE
+    whd_spi_config_t *whd_spi_cfg = malloc(sizeof(whd_spi_config_t));
+    cyhal_spi_t *spi_obj = malloc(sizeof(cyhal_spi_t));
+    whd_bus_spi_attach(whd_driver, whd_spi_cfg, spi_obj);
+#else
+    #error "Unsupported CYBSP_WIFI_INTERFACE_TYPE"
+#endif
     
     whd_interface_t ifp = malloc(sizeof(whd_interface_t));
     // Switch on Wifi, download firmware and create a primary interface, returns whd_interface_t
@@ -51,7 +59,13 @@ int main()
     // Switch off Wifi
     whd_wifi_off(ifp);
     // Detach a bus SDIO or SPI
+#if CYBSP_WIFI_INTERFACE_TYPE == CYBSP_SDIO_INTERFACE
     whd_bus_sdio_detach(whd_driver);
+#elif CYBSP_WIFI_INTERFACE_TYPE == CYBSP_SPI_INTERFACE
+    whd_bus_spi_detach(whd_driver);
+#else
+    #error "Unsupported CYBSP_WIFI_INTERFACE_TYPE"
+#endif
     //or whd_bus_spi_detach(whd_driver);
     // Deletes all the interface and De-init the whd, free whd_driver memory
     whd_deinit(ifp);

@@ -43,6 +43,8 @@ ifeq ($(IAR),1)
 TOOLCHAIN_NAME := IAR
 endif
 
+CYBSP_WIFI_INTERFACE_TYPE ?= 0
+
 #Set the default; Only win32 and arm_gnu supported for now
 TOOLCHAIN_NAME ?= GCC
 
@@ -57,16 +59,16 @@ INC_FLAGS := $(addprefix -I,$(INC_DIRS))
 
 LDFLAGS :=
 ifeq ($(TOOLCHAIN_NAME),GCC)
-COMPILER_FLAGS := -Wall -Wmisleading-indentation -Wnarrowing -Wsign-compare -fsigned-char -ffunction-sections -fdata-sections -fno-common -std=gnu11 -fdiagnostics-color -Werror  -DNDEBUG -ggdb -O2 -mthumb -mcpu=cortex-m4    -mlittle-endian
+COMPILER_FLAGS := -DCYBSP_WIFI_INTERFACE_TYPE=$(CYBSP_WIFI_INTERFACE_TYPE) -Wall -Wmisleading-indentation -Wnarrowing -Wsign-compare -fsigned-char -ffunction-sections -fdata-sections -fno-common -std=gnu11 -fdiagnostics-color -Werror  -DNDEBUG -ggdb -O2 -mthumb -mcpu=cortex-m4    -mlittle-endian
 COMPILER_SPECIFIC_ARFLAGS_CREATE      := -rcs
 LDFLAGS := -specs=nosys.specs -Wl,-Map,$(BUILD_FOLDER)/whd.map
 DEP_FLAGS := -MMD
 else ifeq ($(TOOLCHAIN_NAME),ARMCC)
-COMPILER_FLAGS := --target=arm-arm-none-eabi -march=armv8-m.main -mfpu=fpv4-sp-d16 -Wall -Wnarrowing -Wsign-compare -fsigned-char -ffunction-sections -fdata-sections -fno-common -std=gnu11 -fdiagnostics-color -Werror  -DNDEBUG -ggdb -O2 -mthumb -mcpu=cortex-m4  -mlittle-endian  -fshort-enums
+COMPILER_FLAGS := -DCYBSP_WIFI_INTERFACE_TYPE=$(CYBSP_WIFI_INTERFACE_TYPE) --target=arm-arm-none-eabi -march=armv8-m.main -mfpu=fpv4-sp-d16 -Wall -Wnarrowing -Wsign-compare -fsigned-char -ffunction-sections -fdata-sections -fno-common -std=gnu11 -fdiagnostics-color -Werror  -DNDEBUG -ggdb -O2 -mthumb -mcpu=cortex-m4  -mlittle-endian  -fshort-enums
 COMPILER_SPECIFIC_ARFLAGS_CREATE      := -rcs
 DEP_FLAGS := -MMD
 else ifeq ($(TOOLCHAIN_NAME),IAR)
-COMPILER_FLAGS := --silent --char_is_signed -e --vla  --dlib_config full  -DNDEBUG --debug -Oh --cpu_mode thumb --cpu Cortex-M4  --endian little --warnings_are_errors --require_prototypes
+COMPILER_FLAGS := -DCYBSP_WIFI_INTERFACE_TYPE=$(CYBSP_WIFI_INTERFACE_TYPE) --silent --char_is_signed -e --vla  --dlib_config full  -DNDEBUG --debug -Oh --cpu_mode thumb --cpu Cortex-M4  --endian little --warnings_are_errors --require_prototypes
 COMPILER_SPECIFIC_ARFLAGS_CREATE := --create -o
 DEP_FLAGS := --dependencies=m +
 LDFLAGS := --silent
